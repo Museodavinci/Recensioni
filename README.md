@@ -1,0 +1,71 @@
+[redirect.html](https://github.com/user-attachments/files/28885691/redirect.html)
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reindirizzamento…</title>
+<style>
+  body {
+    font-family: Georgia, serif;
+    background: #f7f3ec;
+    color: #1a1612;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+    padding: 20px;
+  }
+  .box { max-width: 360px; }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #ddd5c0;
+    border-top-color: #c9952a;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  p { font-size: 0.95rem; color: #7a7060; }
+  a { color: #c9952a; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="spinner"></div>
+    <p id="msg">Un attimo, stiamo per portarti alla pagina delle recensioni…</p>
+  </div>
+
+<script>
+  // ─────────────────────────────────────────────────────────────
+  // CONFIGURA QUI: l'URL del tuo Apps Script Web App (termina in /exec)
+  // ─────────────────────────────────────────────────────────────
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzR4F0jacJ4DfkZwx-DOfAKOs0KiDXCrgFF5Ct9f8qEb_e2dZH99cicHt41o4sToE59/exec';
+
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  const platform = params.get('platform');
+  const msg = document.getElementById('msg');
+
+  if (!ref || !platform) {
+    msg.textContent = 'Link non valido: manca il riferimento dipendente o la piattaforma.';
+  } else {
+    const url = `${SCRIPT_URL}?ref=${encodeURIComponent(ref)}&platform=${encodeURIComponent(platform)}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.dest) {
+          window.location.replace(data.dest);
+        } else {
+          msg.textContent = (data && data.error) ? data.error : 'Destinazione non configurata. Controlla il foglio "Settings".';
+        }
+      })
+      .catch(() => {
+        msg.textContent = 'Errore di connessione. Riprova più tardi.';
+      });
+  }
+</script>
+</body>
+</html>
